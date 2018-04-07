@@ -1,23 +1,40 @@
-import sounddevice as sd 
-import numpy as np
+import pyaudio
+import wave
+import time
+import sys
 
-#prompt user to select recorded device
-print(sd.query_devices())
-device = int(input("Pick a device to record:"))
-sd.default.device = device;
+if len(sys.argv) < 2:
+	print("Plays a wave file.\n\nUsage: $s filename.wav" % sys.argv[0])
+	sys.exit(-1)
 
+wf = wave.open(sys.argv[1], 'rb')
 
-#record some audio from the device
-fs = 44100 #Hz
-sd.default.samplerate = fs #Hz
-sd.default.channels = 2
-duration = 10 #seconds
-recording = sd.rec(int(duration * fs))
+#instantiate PyAudio
+p = pyaudio.PyAudio()
 
+#define callback
+def callback(in_data, frame_count, time_info, status):
+	data = wf.readframes(frame_count)
+	return (data, pyaudio.paContinue)
 
-#get a device to play back the recorded audio
-device = int(input("Pick a device to play:"))
-sd.default.device = device;
+#open stream using callback function
+stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
+				channels=wf.getnchannels(),
+				rate=wf.getframerate(),
+				output=True,
+				stream_callback=callback)
 
-sd.play(recording, fs)
-sd.wait()
+#start up that bad boi
+stream.start_stream()
+
+#wait for it to finish
+while stream.is_active():
+	time.sleep(0.1)
+
+# stop stream
+stream.stop_stream()
+stream.close()
+wf.close()
+
+#close PyAudio
+p.terminate()
