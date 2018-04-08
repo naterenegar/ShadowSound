@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import collections
 
 np.set_printoptions(threshold=np.nan)
-
+'''
 class Decoder:
     """Singleton decoder class, storing current message"""
 
@@ -59,10 +59,50 @@ class Decoder:
     def clear(self):
         self.n_chunks = 0
         self.f_vals = np.zeros((512,len(self.freqs)),dtype=int)
+'''
+
+f = wave.open('test4.wav')
+l = f.getnframes()
+frames = f.readframes(l)
+dt = np.dtype(np.int16)
+dt = dt.newbyteorder('<')
+npbuf = np.frombuffer(frames, dt)
+
+RATE = 44100
+FRAME_SIZE = 1.0
+TRACKING_FREQ = 800
+DELTA = 50
+F_THRESHOLD = 10
+frame_width = int(FRAME_SIZE*RATE)
+nframes = int(len(npbuf)*FRAME_SIZE/RATE);
+
+
+frames = np.split(npbuf, np.arange(frame_width,nframes*frame_width,frame_width))
+
+out = []
+
+for frame in frames:
+    N = len(frame)
+    li = int((TRACKING_FREQ-DELTA)*N/RATE)
+    lu = int((TRACKING_FREQ+DELTA)*N/RATE)
+    fft = scipy.fftpack.fft(frame)
+    fft = (2/N)*np.absolute(fft)
+    f_val = np.median(fft[li:lu])
+    if f_val < F_THRESHOLD:
+        out.insert(0,1)
+    else:
+        out.insert(0,0)
+
+it = [iter(out)] * 5
+print(list(zip(*it)))
 
 
 
 
+
+        
+
+'''
 decoder = Decoder(.5*44100,np.asarray([500]))
 
 
@@ -164,7 +204,7 @@ while True:
     print("Amplitude: " + str(np.mean(np.absolute(data_array))) + " < Threshold: " + str(A_t))
     print("Frequency Amplitude: " + str(np.mean(fft[li:lu])) + " > Threshold: " + str(A_ct))
     print("Tracking amplitude stdvar: "+ str(np.std(V_f_data)))
-
+'''
 
 '''
 RECORD_SECONDS = 5
@@ -190,8 +230,8 @@ while True:
 #print(frames)
 
 # stop Recording
-stream.stop_stream()
-stream.close()
+#stream.stop_stream()
+#stream.close()
 
 '''
 f = wave.open('test4.wav')
