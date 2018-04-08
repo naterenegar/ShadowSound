@@ -36,8 +36,8 @@ reqseconds = len(toencode) * sample
 indata = source.readframes(source.getnframes())
 outdata = []
 def notch(fft, freq):
-    b = freq_to_index(max(freq-delta, 0), int(sample/4), source.getframerate())
-    e = freq_to_index(min(freq+delta, 20000), int(sample/4), source.getframerate())
+    b = freq_to_index(max(freq-delta, 0), int(sample/2), source.getframerate())
+    e = freq_to_index(min(freq+delta, 20000), int(sample/2), source.getframerate())
     bm = mirror(b, fft)
     em = mirror(e, fft)
     print(len(list(filter(lambda f: f == -1, fft))))
@@ -69,8 +69,8 @@ def parse(raw, v):
 
 for v in toencode:
     print(len(indata))
-    toParse = indata[:int(sample/2)]
-    indata = indata[int(sample/2):]
+    toParse = indata[:sample]
+    indata = indata[sample:]
     outdata = outdata + parse(toParse, v)
 
 final = np.asarray(outdata, dt)
