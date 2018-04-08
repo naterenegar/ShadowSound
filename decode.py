@@ -5,6 +5,7 @@ import scipy.signal
 import pyaudio
 import matplotlib.pyplot as plt
 import collections
+import baudot
 
 np.set_printoptions(threshold=np.nan)
 '''
@@ -94,10 +95,12 @@ for frame in frames:
         out.insert(0,0)
 
 it = [iter(out)] * 5
-print(list(zip(*it)))
+baudot_list = list(zip(*it))
 
 
+string = "".join([baudot.baudot_to_str(x) for x in baudot_list])
 
+print(string)
 
 
         
