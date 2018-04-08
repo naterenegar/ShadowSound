@@ -36,8 +36,8 @@ reqseconds = len(toencode) * sample
 indata = source.readframes(source.getnframes())
 outdata = []
 def notch(fft, freq):
-    b = freq_to_index(max(freq-delta, 0), sample, source.getframerate())
-    e = freq_to_index(min(freq+delta, 20000), sample, source.getframerate())
+    b = freq_to_index(max(freq-delta, 0), int(sample/2), source.getframerate())
+    e = freq_to_index(min(freq+delta, 20000), int(sample/2), source.getframerate())
     bm = mirror(b, fft)
     em = mirror(e, fft)
     print(len(list(filter(lambda f: f == -1, fft))))
@@ -75,7 +75,7 @@ for v in toencode:
 
 final = np.asarray(outdata, dt)
 print(final.shape)
-scipy.io.wavfile.write(source_fn[:-3] + '_edit.wav', sample, final)
+scipy.io.wavfile.write(source_fn[:-4] + '_edit.wav', sample, final)
 print('Done!')
 
 
