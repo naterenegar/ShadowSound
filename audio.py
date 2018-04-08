@@ -72,8 +72,6 @@ class Track:
         graph_fft(self)
         self.store = self.store + np.real(numpy.fft.ifft(self.fft)).astype(numpy.int16).tolist()
 
-            
-
     def notch(self, freq, delta):
         b = freq_to_index(max(freq-delta, 0), self.size, self.framerate)
         e = freq_to_index(min(freq+delta, self.max_freq()), self.size, self.framerate)
@@ -170,7 +168,7 @@ def encode(source, data):
 encode('bluesky.wav', [1,0,1,0,1,0,1,0,1,0,1])
 
 
-#source_f = wave.open(source_fn)
+source_f = wave.open(source_fn)
 
-#track.write('out.wav')
+track.write('out.wav')
 
